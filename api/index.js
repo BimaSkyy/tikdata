@@ -1,3 +1,9 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 function cleanUsername(raw) {
   let clean = (raw || '').trim();
   if (clean.includes('tiktok.com/')) {
@@ -371,6 +377,13 @@ export default async function handler(req, res) {
   if (pathname === '/' || pathname === '/index.html') {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.statusCode = 200;
+    try {
+      const htmlPath = path.join(__dirname, '..', 'public', 'index.html');
+      if (fs.existsSync(htmlPath)) {
+        res.end(fs.readFileSync(htmlPath, 'utf-8'));
+        return;
+      }
+    } catch (e) {}
     res.end(getHtmlUI());
     return;
   }
