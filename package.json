@@ -1,0 +1,19 @@
+{
+  "name": "tiktok-api-vercel",
+  "version": "1.0.0",
+  "description": "TikTok REST API & Web UI for Profile, New Videos, and Video Analytics",
+  "main": "api/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "tiktok",
+    "scraper",
+    "api",
+    "vercel"
+  ],
+  "author": "",
+  "license": "MIT"
+}
