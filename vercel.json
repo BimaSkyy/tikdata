@@ -2,6 +2,18 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/tiktok-new-video",
+      "destination": "/api/index.js?action=new-video"
+    },
+    {
+      "source": "/tiktok-data-video",
+      "destination": "/api/index.js?action=data-video"
+    },
+    {
+      "source": "/tiktok-profile",
+      "destination": "/api/index.js?action=profile"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api/index.js"
     }
