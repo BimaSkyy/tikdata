@@ -369,12 +369,22 @@ export default async function handler(req, res) {
     return;
   }
 
-  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const reqUrl = req.url || '';
+  const parsedUrl = new URL(reqUrl, `http://${req.headers.host || 'localhost'}`);
   const pathname = parsedUrl.pathname;
   const searchParams = parsedUrl.searchParams;
+  const action = searchParams.get('action') || '';
+  const matchedPath = req.headers['x-matched-path'] || req.headers['x-forwarded-uri'] || '';
+  const originalPath = matchedPath.split('?')[0];
+
+  // Routing yang kebal terhadap semua jenis rewrite Vercel
+  const isNewVideo = action === 'new-video' || pathname.includes('tiktok-new-video') || originalPath.includes('tiktok-new-video') || (reqUrl.includes('new-video') && searchParams.has('username'));
+  const isDataVideo = action === 'data-video' || pathname.includes('tiktok-data-video') || originalPath.includes('tiktok-data-video') || searchParams.has('url');
+  const isProfile = action === 'profile' || pathname.includes('tiktok-profile') || originalPath.includes('tiktok-profile') || (searchParams.has('username') && !isNewVideo);
+  const isRoot = !isNewVideo && !isDataVideo && !isProfile;
 
   // Root Homepage (HTML Web UI)
-  if (pathname === '/' || pathname === '/index.html') {
+  if (isRoot) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.statusCode = 200;
     try {
@@ -389,7 +399,7 @@ export default async function handler(req, res) {
   }
 
   // 1. Endpoint: /tiktok-new-video?username=
-  if (pathname === '/tiktok-new-video') {
+  if (isNewVideo) {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     try {
       const username = searchParams.get('username');
@@ -404,7 +414,7 @@ export default async function handler(req, res) {
   }
 
   // 2. Endpoint: /tiktok-data-video?url=
-  if (pathname === '/tiktok-data-video') {
+  if (isDataVideo) {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     try {
       const videoUrl = searchParams.get('url');
@@ -419,7 +429,7 @@ export default async function handler(req, res) {
   }
 
   // 3. Endpoint: /tiktok-profile?username=
-  if (pathname === '/tiktok-profile') {
+  if (isProfile) {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     try {
       const username = searchParams.get('username');
